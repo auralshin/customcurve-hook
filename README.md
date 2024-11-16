@@ -1,6 +1,6 @@
-# CurveHooks: Custom Invariant Curve Hooks for Uniswap v4
+# CustomHooks: Custom Invariant Curve Hooks for Uniswap v4
 
-**CurveHooks is a customizable hook-based solution for Uniswap v4, enabling trading on custom invariant curves while leveraging Uniswap's efficient pool and routing infrastructure.**
+**CustomHooks is a customizable hook-based solution for Uniswap v4, enabling trading on custom invariant curves while leveraging Uniswap's efficient pool and routing infrastructure.**
 
 This repository contains two distinct curve implementations:
 
