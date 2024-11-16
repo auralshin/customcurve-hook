@@ -75,22 +75,11 @@ Where:
 
 ### 2. Weighted Product Curve (StableHook)
 
-The weighted product curve generalizes the constant-product curve by introducing token weights:
-![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/SCR-20241117-gmsu.png)
+The weighted product curve generalizes the constant-product curve by introducing token weights
 
 Key formula:
+![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/SCR-20241117-gmsu.png)
 
-- **Exact Input Swap:**
-  \[
-  \text{amountOut} = R_B - R_B'
-  \]
-  Where \( R_B' \) is the new reserve of token B, derived from solving the invariant.
-
-- **Exact Output Swap:**
-  \[
-  \text{amountIn} = R_A' - R_A
-  \]
-  Where \( R_A' \) is the new reserve of token A, derived from solving the invariant.
 
   ![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/weighted.svg)
 
