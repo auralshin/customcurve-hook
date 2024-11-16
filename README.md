@@ -92,6 +92,8 @@ Key formula:
   \]
   Where \( R_A' \) is the new reserve of token A, derived from solving the invariant.
 
+  ![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/weighted.svg)
+
 ---
 
 ## Configuration
