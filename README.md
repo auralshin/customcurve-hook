@@ -1,103 +1,105 @@
-# StableHook: Weighted Product Curve Hook for Uniswap v4
+# CurveHooks: Custom Invariant Curve Hooks for Uniswap v4
 
-**StableHook is a custom Weighted Product Curve Hook built for Uniswap v4, designed to enable trading on a custom invariant curve while leveraging the existing Uniswap pool and routing infrastructure.**
+**CurveHooks is a customizable hook-based solution for Uniswap v4, enabling trading on custom invariant curves while leveraging Uniswap's efficient pool and routing infrastructure.**
 
-## Introduction
+This repository contains two distinct curve implementations:
 
-The StableHook modifies the trading behavior of a Uniswap pool by replacing its constant-product curve with a custom invariant curve based on reserves and token weights. While Uniswap's router finds routes and initializes swaps, the trading itself occurs on the custom curve defined within the hook.
+1. **Lambert Curve Hook (Lammbert):**
 
-This approach retains the efficiency and flexibility of Uniswap's infrastructure while allowing for a more tailored trading experience suited to specific use cases.
+   - Implements a curve derived from the Lambert W function.
+   - Suitable for concentrated liquidity scenarios where trades require dynamic pricing.
 
-## Core Features
-
-1. **Custom invariant Curve:**
-
-   - Implements a **weighted reserve invariant** similar to Balancer:
-     \[
-     R_A^{w_A} \cdot R_B^{w_B} = k
-     \]
-     Where:
-     - \( R_A, R_B \): Reserves of the tokens in the pool.
-     - \( w_A, w_B \): Weights of the tokens, defining their relative importance in the pool.
-     - \( k \): Constant invariant maintained during swaps.
-
-2. **Uniswap Integration:**
-
-   - Leverages the **Uniswap v4 Pool Manager** and router for route discovery and token transfers.
-   - The hook intercepts the trade logic, ensuring swaps execute on the custom curve.
-
-3. **Efficient Trading:**
-   - Supports exact input and exact output swaps.
-   - Calculates swap amounts (`amountOut` and `amountIn`) based on the invariant curve logic.
+2. **Weighted Product Curve Hook (StableHook):**
+   - Implements a weighted reserve invariant similar to Balancer.
+   - Ideal for use cases requiring token weights to adjust relative importance in the pool.
 
 ---
 
-## How It Works
+## Introduction
 
-1. **Pool Initialization:**
+The hooks modify the trading behavior of a Uniswap pool by replacing the constant-product \( x \cdot y = k \) curve with custom invariant curves. While Uniswap's router determines routes and initializes swaps, the trade itself executes on the selected custom curve.
 
-   - A Uniswap pool is initialized using the standard Uniswap v4 infrastructure.
+This approach retains Uniswap's flexibility and efficiency while enabling tailored trading experiences for specific use cases.
 
-2. **Hook Integration:**
+---
 
-   - The `StableHook` is deployed and linked to the pool.
-   - The hook is configured to handle pre-swap logic (`beforeSwap`).
+## Core Features
 
-3. **Trade Execution:**
-   - When a swap is routed through the Uniswap router:
-     - The `StableHook` intercepts the trade.
-     - Executes the swap on the **custom invariant curve** based on the pool's reserves and token weights.
+1. **Custom Invariant Curves:**
+
+   - Choose between two distinct invariant curve options:
+     - **Lambert Curve:**  
+       Uses the Lambert W function for precise and dynamic liquidity management.
+     - **Weighted Product Curve:**  
+       Implements a **weighted reserve invariant**:
+       \[
+       R_A^{w_A} \cdot R_B^{w_B} = k
+       \]
+       Where:
+       - \( R_A, R_B \): Reserves of tokens A and B in the pool.
+       - \( w_A, w_B \): Weights of tokens A and B, defining their relative importance.
+       - \( k \): Constant invariant maintained during swaps.
+
+2. **Uniswap Integration:**
+
+   - Fully integrated with the **Uniswap v4 Pool Manager** and router for seamless route discovery and token transfers.
+   - The hooks intercept trade logic, ensuring swaps execute on the selected curve.
+
+3. **Efficient and Flexible Trading:**
+   - Supports exact input and exact output swaps.
+   - Dynamically computes swap amounts (`amountOut` and `amountIn`) based on the invariant curve logic.
 
 ---
 
 ## Curve Details
 
-The hook uses a **weighted invariant formula** to calculate swap amounts:
-\[
-R_A^{w_A} \cdot R_B^{w_B} = k
-\]
+### 1. Lambert Curve (Lammbert Hook)
 
-- **Exact Input Swap:**
-  - Calculates the new reserves of the tokens after adding the input amount.
-  - Computes the corresponding output amount by maintaining the invariant.
-- **Exact Output Swap:**
-  - Determines the required input amount by solving for the reserves that maintain the invariant.
+The Lambert curve uses the Lambert W function to dynamically adjust liquidity and pricing based on pool state. This curve is especially useful for concentrated liquidity and stable assets.
+
+Key formula:
+![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/SCR-20241117-gmvu.png)
+
+
+Where:
+
+- \( W \): Lambert W function.
+- \( c \): Liquidity concentration factor based on reserves.
+- \( x, y \): Input and output amounts.
+
+![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/lammbert.svg)
+
+
 
 ---
 
-## Technical Overview
+### 2. Weighted Product Curve (StableHook)
 
-### Key Functions
+The weighted product curve generalizes the constant-product curve by introducing token weights:
+![Alt Text](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/SCR-20241117-gmsu.png)
 
-1. **`beforeSwap`:**
+Key formula:
 
-   - Intercepts the swap call from the Uniswap router.
-   - Computes the `amountOut` or `amountIn` based on the invariant curve logic.
-   - Adjusts token balances in the pool accordingly.
+- **Exact Input Swap:**
+  \[
+  \text{amountOut} = R_B - R_B'
+  \]
+  Where \( R_B' \) is the new reserve of token B, derived from solving the invariant.
 
-2. **`getAmountOutFromExactInput`:**
-
-   - Computes the output amount for a given input using the invariant curve:
-     \[
-     \text{amountOut} = R_B - R_B'
-     \]
-     Where:
-     - \( R_B' \): New reserve of Token B calculated by solving the invariant.
-
-3. **`getAmountInForExactOutput`:**
-   - Computes the required input amount for a desired output:
-     \[
-     \text{amountIn} = R_A' - R_A
-     \]
-     Where:
-     - \( R_A' \): New reserve of Token A calculated by solving the invariant.
+- **Exact Output Swap:**
+  \[
+  \text{amountIn} = R_A' - R_A
+  \]
+  Where \( R_A' \) is the new reserve of token A, derived from solving the invariant.
 
 ---
 
 ## Configuration
 
-- **Weights:** Both tokens in the pool are assigned equal weights (50:50).
-- **Precision:** Fixed-point arithmetic with \( 10^{18} \) scaling is used for calculations.
+- **Lambert Curve:**
+  - Dynamic liquidity management based on input amounts and reserve states.
+- **Weighted Product Curve:**
+  - Configured with equal weights (50:50) by default. Token weights can be adjusted as needed.
 
 ---
 
@@ -108,35 +110,72 @@ R_A^{w_A} \cdot R_B^{w_B} = k
 - **Foundry** or a compatible Solidity development environment.
 - Access to Uniswap v4 contracts.
 
+---
+
 ### Setup
 
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
-   cd stable-hook
+   git clone https://github.com/auralshin/customcurve-hook
+   cd curve-hooks
    ```
 
-   #### **Install Dependencies**
+2. Install dependencies:
 
-   Run the following command to install all required dependencies:
+   ```bash
+   forge install
+   ```
 
-```bash
-forge install
-```
+3. Compile contracts:
 
-#### **Compile Contract**
+   ```bash
+   forge build --evm-version cancun --via-ir
+   ```
 
-Compile the StableHook contract and other associated files:
+4. Test the contracts:
 
-```bash
-forge build --evm-version cancun --via-ir
-```
+   ```bash
+   forge test --evm-version cancun --via-ir -vvvv
+   ```
 
-#### **Test Contract**
+---
 
-Use the following command to test the StableHook contract:
+## How It Works
 
-```bash
-forge test --evm-version cancun --via-ir  -vvvv
-```
+1. **Pool Initialization:**
+
+   - Pools are initialized using the standard Uniswap v4 infrastructure.
+
+2. **Hook Selection:**
+
+   - Deploy either `LammbertHook` or `StableHook` and attach it to the pool.
+
+3. **Trade Execution:**
+   - Swaps routed through Uniswap are intercepted by the selected hook.
+   - The hook executes the trade based on its custom invariant curve logic.
+
+---
+
+## Example Use Cases
+
+1. **Lambert Curve Hook:**
+
+   - Concentrated liquidity pools for stablecoins or tightly correlated assets.
+   - Dynamic pricing based on reserve concentration.
+
+2. **Weighted Product Curve Hook:**
+   - Multi-token pools with variable weights for token pair importance.
+   - Enhanced flexibility for liquidity providers.
+
+---
+
+## Contributions
+
+Contributions to enhance or extend the hook implementations are welcome! Feel free to open issues or submit pull requests.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
