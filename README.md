@@ -1,6 +1,6 @@
-# StableHook: Invariant Curve Hook for Uniswap v4
+# StableHook: Weighted Product Curve Hook for Uniswap v4
 
-**StableHook is a custom Invariant Curve Hook built for Uniswap v4, designed to enable trading on a custom invariant curve while leveraging the existing Uniswap pool and routing infrastructure.**
+**StableHook is a custom Weighted Product Curve Hook built for Uniswap v4, designed to enable trading on a custom invariant curve while leveraging the existing Uniswap pool and routing infrastructure.**
 
 ## Introduction
 
@@ -10,7 +10,7 @@ This approach retains the efficiency and flexibility of Uniswap's infrastructure
 
 ## Core Features
 
-1. **Custom Invariant Curve:**
+1. **Custom invariant Curve:**
 
    - Implements a **weighted reserve invariant** similar to Balancer:
      \[
