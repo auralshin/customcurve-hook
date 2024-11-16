@@ -170,6 +170,14 @@ Key formula:
 
 ---
 
+## Results
+
+![Result](https://raw.githubusercontent.com/auralshin/customcurve-hook/main/images/SCR-20241117-golt.png)
+
+
+
+---
+
 ## Contributions
 
 Contributions to enhance or extend the hook implementations are welcome! Feel free to open issues or submit pull requests.
